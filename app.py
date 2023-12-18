@@ -532,6 +532,8 @@ def main():
                             # Rounding off the values to whole numbers
                             latest_value = round(latest_value)
                             predictions[0] = round(predictions[0])
+                            
+                st.plotly_chart(fig)
 
                             # Checking if the predicted value indicates growth compared to the latest data
                             if predictions[0] > latest_value:
@@ -591,8 +593,6 @@ def main():
                                             </div>
                                         """, unsafe_allow_html=True)
 
-
-                st.plotly_chart(fig)
 
 
         with open('stacked_model_drop.pkl', 'rb') as file:
@@ -743,6 +743,8 @@ def main():
                                 latest_value = round(latest_value)
                                 predictions[0] = round(predictions[0])
 
+                    st.plotly_chart(fig)
+
                                 # Checking if the predicted value indicates growth compared to the latest data
                                 if predictions[0] > latest_value:
                                     growth_amount = predictions[0] - latest_value
@@ -803,8 +805,6 @@ def main():
                                                 </div>
                                             """, unsafe_allow_html=True)
 
-
-                    st.plotly_chart(fig)
 
         with open('stacked_model_grad.pkl', 'rb') as file:
             stacked_model = pickle.load(file)
@@ -954,6 +954,8 @@ def main():
                                 latest_value = round(latest_value)
                                 predictions[0] = round(predictions[0])
 
+                    st.plotly_chart(fig)
+
                                 # Checking if the predicted value indicates growth compared to the latest data
                                 if predictions[0] > latest_value:
                                     growth_amount = predictions[0] - latest_value
@@ -1011,9 +1013,6 @@ def main():
                                                     </div>
                                                 </div>
                                             """, unsafe_allow_html=True)
-
-
-                    st.plotly_chart(fig)
 
 
             if tabs == "🆕 Add new data":
