@@ -872,6 +872,8 @@ def main():
                         user_data = [[sy_input, id_input, en_input]]
                         predictions = stacked_model.predict(user_data)
 
+                        predictions = [max(0, pred) for pred in predictions]
+
                         filtered_data = data[data['Program ID'] == id_input]
 
                         if len(filtered_data) > 0:
