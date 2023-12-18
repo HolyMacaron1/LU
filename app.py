@@ -510,7 +510,7 @@ def main():
                             hovermode='closest',
                             plot_bgcolor='#f0f0f0',  # Background color of the plot
                             paper_bgcolor='#ffffff',  # Background color of the paper/plot area
-                            width=860,  # Adjust the width of the plot
+                            width=800,  # Adjust the width of the plot
                             height=600,  # Adjust the height of the plot
                             margin=dict(l=80, r=80, t=100, b=80),  # Adjust margins for better display
                             transition={'duration': 1000}  # Add smooth transition/animation
@@ -720,7 +720,7 @@ def main():
                                 hovermode='closest',
                                 plot_bgcolor='#f0f0f0',  # Background color of the plot
                                 paper_bgcolor='#ffffff',  # Background color of the paper/plot area
-                                width=960,  # Adjust the width of the plot
+                                width=800,  # Adjust the width of the plot
                                 height=600,  # Adjust the height of the plot
                                 margin=dict(l=80, r=80, t=100, b=80),  # Adjust margins for better display
                                 transition={'duration': 1000}  # Add smooth transition/animation
@@ -931,7 +931,7 @@ def main():
                                 hovermode='closest',
                                 plot_bgcolor='#f0f0f0',  # Background color of the plot
                                 paper_bgcolor='#ffffff',  # Background color of the paper/plot area
-                                width=960,  # Adjust the width of the plot
+                                width=800,  # Adjust the width of the plot
                                 height=600,  # Adjust the height of the plot
                                 margin=dict(l=80, r=80, t=100, b=80),  # Adjust margins for better display
                                 transition={'duration': 1000}  # Add smooth transition/animation
