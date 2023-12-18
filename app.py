@@ -33,7 +33,7 @@ img = get_img_as_base64("green.jpg")
 page_bg_img = f"""
 <style>
 [data-testid="stAppViewContainer"] > .main {{
-background-image: url("https://scontent.fmnl30-1.fna.fbcdn.net/v/t1.15752-9/409412298_1453175752285633_1675291559160145762_n.png?_nc_cat=103&ccb=1-7&_nc_sid=8cd0a2&_nc_eui2=AeGOSitY8F09aBwNg4fnGoBrJce81NeXzEQlx7zU15fMRCCalcD4yocsQsGHRO0ZfxcjjYvkliOdqCUCJTSC-F2D&_nc_ohc=GY3-Ic1us7cAX_NPKAT&_nc_ht=scontent.fmnl30-1.fna&oh=03_AdRohuOIvNWr4j847Ddv24M-7uh8CLZnNGqGDpr0KbmTcQ&oe=65A73A6F");
+background-image: url("https://scontent.fmnl30-2.fna.fbcdn.net/v/t1.15752-9/410499121_3577211259212349_1485141885897525634_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=8cd0a2&_nc_eui2=AeFVP3a1O9bWLa_HLnWhHsRnFscyllWYPVAWxzKWVZg9UMaT6XkrTJVmMNurVXZyUUS25DI-xvWCbMmwOo92PyF4&_nc_ohc=xRBTjWQw24AAX927X3y&_nc_ht=scontent.fmnl30-2.fna&oh=03_AdStScUdhN91uxYjQ2REOkuqs8MhRp1YcIxdI2nDVsRv_g&oe=65A7AB3D");
 background-size: cover;
 background-position: top left;
 background-repeat: no-repeat;
@@ -525,6 +525,8 @@ def main():
                         st.markdown(styled_prediction_text, unsafe_allow_html=True)
                         st.markdown(styled_original_text, unsafe_allow_html=True)
 
+                        st.plotly_chart(fig)
+
                         # Checking for significant growth or decrease based on predictions compared to the latest data
                         if original_value is None:
                             latest_value = filtered_data['Number of Enrollees'].iloc[-1]  # Fetching the latest value from the data
@@ -532,8 +534,6 @@ def main():
                             # Rounding off the values to whole numbers
                             latest_value = round(latest_value)
                             predictions[0] = round(predictions[0])
-                            
-                st.plotly_chart(fig)
 
                             # Checking if the predicted value indicates growth compared to the latest data
                             if predictions[0] > latest_value:
@@ -593,6 +593,8 @@ def main():
                                             </div>
                                         """, unsafe_allow_html=True)
 
+
+                
 
 
         with open('stacked_model_drop.pkl', 'rb') as file:
@@ -735,6 +737,8 @@ def main():
                             st.markdown(styled_prediction_text, unsafe_allow_html=True)
                             st.markdown(styled_original_text, unsafe_allow_html=True)
 
+                            st.plotly_chart(fig)
+
                             # Checking for significant growth or decrease based on predictions compared to the latest data
                             if original_value is None:
                                 latest_value = filtered_data['Number of Dropout'].iloc[-1]  # Fetching the latest value from the data
@@ -742,8 +746,6 @@ def main():
                                 # Rounding off the values to whole numbers
                                 latest_value = round(latest_value)
                                 predictions[0] = round(predictions[0])
-
-                    st.plotly_chart(fig)
 
                                 # Checking if the predicted value indicates growth compared to the latest data
                                 if predictions[0] > latest_value:
@@ -805,6 +807,8 @@ def main():
                                                 </div>
                                             """, unsafe_allow_html=True)
 
+
+                    
 
         with open('stacked_model_grad.pkl', 'rb') as file:
             stacked_model = pickle.load(file)
@@ -954,7 +958,7 @@ def main():
                                 latest_value = round(latest_value)
                                 predictions[0] = round(predictions[0])
 
-                    st.plotly_chart(fig)
+                                st.plotly_chart(fig)
 
                                 # Checking if the predicted value indicates growth compared to the latest data
                                 if predictions[0] > latest_value:
@@ -1013,6 +1017,9 @@ def main():
                                                     </div>
                                                 </div>
                                             """, unsafe_allow_html=True)
+
+
+                    
 
 
             if tabs == "🆕 Add new data":
