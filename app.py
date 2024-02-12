@@ -33,7 +33,7 @@ img = get_img_as_base64("green.jpg")
 page_bg_img = f"""
 <style>
 [data-testid="stAppViewContainer"] > .main {{
-background-image: url("https://scontent.fmnl30-2.fna.fbcdn.net/v/t1.15752-9/410499121_3577211259212349_1485141885897525634_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=8cd0a2&_nc_eui2=AeFVP3a1O9bWLa_HLnWhHsRnFscyllWYPVAWxzKWVZg9UMaT6XkrTJVmMNurVXZyUUS25DI-xvWCbMmwOo92PyF4&_nc_ohc=xRBTjWQw24AAX927X3y&_nc_ht=scontent.fmnl30-2.fna&oh=03_AdStScUdhN91uxYjQ2REOkuqs8MhRp1YcIxdI2nDVsRv_g&oe=65A7AB3D");
+background-image: url("https://scontent.fmnl30-1.fna.fbcdn.net/v/t1.15752-9/409412298_1453175752285633_1675291559160145762_n.png?_nc_cat=103&ccb=1-7&_nc_sid=8cd0a2&_nc_eui2=AeFh2vXyR7tyUo6LV54YZG4RJce81NeXzEQlx7zU15fMRHcvim4_4fhhLlNzMLGydc7kHaGuEsqrdK-PMbuGwor6&_nc_ohc=Osj1_e0B9NEAX-vcouK&_nc_ht=scontent.fmnl30-1.fna&oh=03_AdSdriG4aAEmp2p7CJ6Ch8dOs3lzAqmqPDG-jBJzCnWFbQ&oe=65F02D6F");
 background-size: cover;
 background-position: top left;
 background-repeat: no-repeat;
@@ -443,11 +443,11 @@ def main():
                     user_data = [[sy_input, id_input]]
                     predictions = stacked_model.predict(user_data)
 
-                    predictions = [max(0, pred) for pred in predictions]
-
+                    # Assuming filtered_data contains only the data for the selected Program ID
                     filtered_data = data[data['Program ID'] == id_input]
 
                     if len(filtered_data) > 0:
+                        # Display original data
                         fig.add_trace(go.Scatter(
                             x=filtered_data['School Year'],
                             y=filtered_data['Number of Enrollees'],
@@ -458,8 +458,9 @@ def main():
                             showlegend=True
                         ))
 
-                        original_value = None
+                        original_value = None  # Initialize original_value here
 
+                        # Check if original value exists for the input year
                         if sy_input in filtered_data['School Year'].values:
                             original_value = filtered_data[filtered_data['School Year'] == sy_input]
                             fig.add_trace(go.Scatter(
@@ -470,6 +471,7 @@ def main():
                                 marker=dict(color='#C70039', size=16, symbol='diamond', line=dict(color='#000000', width=1.5)),
                             ))
 
+                        # Display predicted value for the input year
                         fig.add_trace(go.Scatter(
                             x=[sy_input],
                             y=[predictions[0]],
@@ -477,6 +479,18 @@ def main():
                             name='Predicted Value',
                             marker=dict(color='#4CAF50', size=16, symbol='star', line=dict(color='#000000', width=1.5)),
                         ))
+
+                        # Predict and display values for 2023 to user-input year
+                        if sy_input >= 2023:
+                            for year in range(2023, sy_input + 1):
+                                predicted_value = stacked_model.predict([[year, id_input]])[0]
+                                fig.add_trace(go.Scatter(
+                                    x=[year],
+                                    y=[predicted_value],
+                                    mode='markers',
+                                    name=f'Predicted Value ({year})',
+                                    marker=dict(color='#4CAF50', size=16, symbol='star', line=dict(color='#000000', width=1.5)),
+                                ))
 
                         # Adding a trend line based on historical data if enough data points are available
                         if len(filtered_data) > 1:
@@ -517,12 +531,12 @@ def main():
                             margin=dict(l=80, r=80, t=100, b=80),  # Adjust margins for better display
                             transition={'duration': 1000}  # Add smooth transition/animation
                         )
-                        prediction_text = f"**Predicted Value:** {round(predictions[0])}"
+                        prediction_text = f"Predicted Value: {round(predictions[0])}"
                         if original_value is not None:
-                            original_text = f"**Original Value:** {int(original_value['Number of Enrollees'].values[0])}"
+                            original_text = f"Original Value: {int(original_value['Number of Enrollees'].values[0])}"
 
-                        styled_prediction_text = f"<font color='black' size='+5'>{prediction_text}</font>"
-                        styled_original_text = f"<font color='black' size='+5'>{original_text}</font>"
+                        styled_prediction_text = f"<div style='padding: 20px; border-radius: 50px; margin-bottom: 30px; background: linear-gradient(135deg, #50C878, #458B74, #006400); color: #FFF; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 15px 15px rgba(0, 0, 0, 0.3); animation: rotate-scale 3s ease-in-out infinite, neon-glow 2s linear infinite;'><font size='+6'>{prediction_text}</font></div>"
+                        styled_original_text = f"<div style='padding: 20px; border-radius: 50px; margin-bottom: 30px; color: #006400; animation: rotate-scale 3s ease-in-out infinite, neon-glow 2s linear infinite;'><font size='+6'>{original_text}</font></div>"
 
                         st.markdown(styled_prediction_text, unsafe_allow_html=True)
                         st.markdown(styled_original_text, unsafe_allow_html=True)
@@ -561,19 +575,31 @@ def main():
                                 with col2:
                                     if st.button('📄 Reports', key="increase_recommendation_button",
                                                 help="Click to see reports"):
-                                        st.write(growth_report)
                                         st.markdown("""
-                                            <div style='color: white;'>
-                                                <div style='background-color: #023020; padding: 10px; border-radius: 5px;'>
-                                                    <strong>Recommendation for Handling Increase in Enrollment:</strong><br>
-                                                    - Assess and expand infrastructure to accommodate the increased number of students.<br>
-                                                    - Develop additional educational programs and resources to meet the growing demand.<br>
-                                                    - Recruit and train additional faculty/staff to maintain quality education standards.<br>
-                                                    - Enhance support services for students to ensure a smooth transition and adaptation.<br>
-                                                    - Foster community engagement and partnerships to support the growing student population.<br>
+                                            <div style='color: white; font-family: Arial, sans-serif;'>
+                                                <div style='margin-bottom: 10px;'>
+                                                    <div style='background-color: #2E8B57; padding: 20px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                        <p>{growth_report}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        """.format(growth_report=growth_report), unsafe_allow_html=True)
+
+                                        st.markdown("""
+                                            <div style='color: #fff; font-family: Arial, sans-serif;'>
+                                                <div style='background-color: #2E8B57; padding: 30px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                    <h2 style='margin-bottom: 20px;'>Recommendation for Handling Increase in Enrollment:</h2>
+                                                    <ul style='list-style-type: none; padding-left: 0;'>
+                                                        <li style='margin-bottom: 10px;'>✤ Assess and expand infrastructure to accommodate the increased number of students.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Develop additional educational programs and resources to meet the growing demand.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Recruit and train additional faculty/staff to maintain quality education standards.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Enhance support services for students to ensure a smooth transition and adaptation.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Foster community engagement and partnerships to support the growing student population.</li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         """, unsafe_allow_html=True)
+
 
                             # Checking for decrease to show recommendation button
                             if show_decrease_recommendation:
@@ -581,19 +607,32 @@ def main():
                                 with col2:
                                     if st.button('📄 Reports', key="decrease_recommendation_button",
                                                 help="Click to see reports"):
-                                        st.write(decrease_report)
+                                        st.markdown("""
+                                            <div style='color: white; font-family: Arial, sans-serif;'>
+                                                <div style='margin-bottom: 10px;'>
+                                                    <div style='background-color: #2E8B57; padding: 20px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                        <p>{decrease_report}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        """.format(decrease_report=decrease_report), unsafe_allow_html=True)
+
                                         st.markdown("""
                                             <div style='color: white;'>
-                                                <div style='background-color: #023020; padding: 10px; border-radius: 5px;'>
-                                                    <strong>Recommendation for Handling Decrease in Enrollment:</strong><br>
-                                                    - Analyze the causes behind the decrease and address potential issues.<br>
-                                                    - Implement retention strategies to prevent further decline in enrollment.<br>
-                                                    - Adjust academic programs to better meet the needs of the reduced student body.<br>
-                                                    - Focus on marketing efforts to attract prospective students and boost enrollment.<br>
-                                                    - Collaborate with community stakeholders to understand and address enrollment challenges.<br>
+                                            <div style='color: #fff; font-family: Arial, sans-serif;'>
+                                                <div style='background-color: #2E8B57; padding: 30px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                    <h2 style='margin-bottom: 20px;'>Recommendation for Handling Decrease in Enrollment:</h2>
+                                                    <ul style='list-style-type: none; padding-left: 0;'>
+                                                        <li style='margin-bottom: 10px;'>✤ Analyze the causes behind the decrease and address potential issues.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Implement retention strategies to prevent further decline in enrollment.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Adjust academic programs to better meet the needs of the reduced student body.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Focus on marketing efforts to attract prospective students and boost enrollment.</li>
+                                                        <li style='margin-bottom: 10px;'>✤ Collaborate with community stakeholders to understand and address enrollment challenges.</li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         """, unsafe_allow_html=True)
+
 
 
                 
@@ -657,8 +696,6 @@ def main():
                         user_data = [[sy_input, id_input]]
                         predictions = stacked_model.predict(user_data)
 
-                        predictions = [max(0, pred) for pred in predictions]
-
                         filtered_data = data[data['Program ID'] == id_input]
 
                         if len(filtered_data) > 0:
@@ -706,6 +743,18 @@ def main():
                                     line=dict(color='#00FFFF', width=3),
                                 ))
 
+                            # Predict and display values for 2023 to user-input year
+                            if sy_input >= 2023:
+                                for year in range(2023, sy_input + 1):
+                                    predicted_value = stacked_model.predict([[year, id_input]])[0]
+                                    fig.add_trace(go.Scatter(
+                                        x=[year],
+                                        y=[predicted_value],
+                                        mode='markers',
+                                        name=f'Predicted Value ({year})',
+                                        marker=dict(color='#4CAF50', size=16, symbol='star', line=dict(color='#000000', width=1.5)),
+                                    ))
+
                             fig.update_layout(
                                 title_text='Dropout Prediction',
                                 title_font=dict(size=28, family='Arial, sans-serif', color='#333333'),
@@ -731,12 +780,13 @@ def main():
                                 margin=dict(l=80, r=80, t=100, b=80),  # Adjust margins for better display
                                 transition={'duration': 1000}  # Add smooth transition/animation
                             )
-                            prediction_text = f"**Predicted Value:** {round(predictions[0])}"
+                            prediction_text = f"Predicted Value: {round(predictions[0])}"
                             if original_value is not None:
-                                original_text = f"**Original Value:** {original_value['Number of Dropout'].values[0]}"
+                                original_text = f"Original Value: {original_value['Number of Dropout'].values[0]}"
 
-                            styled_prediction_text = f"<font color='black' size='+5'>{prediction_text}</font>"
-                            styled_original_text = f"<font color='black' size='+5'>{original_text}</font>"
+                            styled_prediction_text = f"<div style='padding: 20px; border-radius: 50px; margin-bottom: 30px; background: linear-gradient(135deg, #50C878, #458B74, #006400); color: #FFF; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 15px 15px rgba(0, 0, 0, 0.3); animation: rotate-scale 3s ease-in-out infinite, neon-glow 2s linear infinite;'><font size='+6'>{prediction_text}</font></div>"
+                            styled_original_text = f"<div style='padding: 20px; border-radius: 50px; margin-bottom: 30px; color: #006400; animation: rotate-scale 3s ease-in-out infinite, neon-glow 2s linear infinite;'><font size='+6'>{original_text}</font></div>"
+
 
                             st.markdown(styled_prediction_text, unsafe_allow_html=True)
                             st.markdown(styled_original_text, unsafe_allow_html=True)
@@ -775,20 +825,30 @@ def main():
                                     with col2:
                                         if st.button('📄 Reports', key="increase_recommendation_button",
                                                     help="Click to see reports"):
-                                            st.write(growth_report)
                                             st.markdown("""
-                                                <div style='color: white;'>
-                                                    <div style='background-color: #023020; padding: 10px; border-radius: 5px;'>
-                                                        <strong>Recommendation for Handling Increase in Dropout Rates:</strong><br>
-                                                        - Implement additional support programs, such as mentoring initiatives, tutoring services,
-                                                        and community outreach, to address potential increases in dropout rates.<br>
-                                                        - Focus on early intervention strategies and personalized assistance for at-risk students.<br>
-                                                        - Strengthen communication channels between educators, students, and parents/guardians.<br>
-                                                        - Conduct regular assessments to identify struggling students and provide targeted support.<br>
-                                                        - Collaborate with local organizations or agencies to create comprehensive support networks.<br>
+                                                <div style='color: white; font-family: Arial, sans-serif;'>
+                                                    <div style='margin-bottom: 10px;'>
+                                                        <div style='background-color: #2E8B57; padding: 20px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                            <p>{growth_report}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            """.format(growth_report=growth_report), unsafe_allow_html=True)
+                                            st.markdown("""
+                                            <div style='color: #fff; font-family: Arial, sans-serif;'>
+                                                <div style='background-color: #2E8B57; padding: 30px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                    <h2 style='margin-bottom: 20px;'>Recommendation for Handling Increase in Dropout Rate:</h2>
+                                                    <ul style='list-style-type: none; padding-left: 0;'>
+                                                            <li style='margin-bottom: 10px;'>✤ Implement additional support programs, such as mentoring initiatives, tutoring services, and community outreach, to address potential increases in dropout rates.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Focus on early intervention strategies and personalized assistance for at-risk students.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Strengthen communication channels between educators, students, and parents/guardians.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Conduct regular assessments to identify struggling students and provide targeted support.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Collaborate with local organizations or agencies to create comprehensive support networks.</li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             """, unsafe_allow_html=True)
+
 
                                 # Checking for decrease to show recommendation button
                                 if show_decrease_recommendation:
@@ -796,20 +856,30 @@ def main():
                                     with col2:
                                         if st.button('📄 Reports', key="decrease_recommendation_button",
                                                     help="Click to see reports"):
-                                            st.write(decrease_report)
                                             st.markdown("""
-                                                <div style='color: white;'>
-                                                    <div style='background-color: #023020; padding: 10px; border-radius: 5px;'>
-                                                         <strong>Recommendation for Decrease in Dropout Rate:</strong><br>
-                                                        Consider maintaining and reinforcing successful programs that contribute to the decrease
-                                                        in dropout rates. Additionally:<br>
-                                                        - Continue to provide academic and emotional support to students.<br>
-                                                        - Evaluate and expand upon strategies that contributed to the decline.<br>
-                                                        - Encourage community involvement and engagement in educational initiatives.<br>
-                                                        - Monitor trends and adjust interventions based on ongoing assessment and feedback.<br>
+                                                <div style='color: white; font-family: Arial, sans-serif;'>
+                                                    <div style='margin-bottom: 10px;'>
+                                                        <div style='background-color: #2E8B57; padding: 20px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                            <p>{decrease_report}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            """.format(decrease_report=decrease_report), unsafe_allow_html=True)
+                                            st.markdown("""
+                                            <div style='color: #fff; font-family: Arial, sans-serif;'>
+                                                <div style='background-color: #2E8B57; padding: 30px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                        <h2 style='margin-bottom: 20px;'>Recommendation for Decrease in Dropout Rate:</h2>
+                                                        <p><strong>Consider maintaining and reinforcing successful programs that contribute to the decrease in dropout rates. Additionally:</strong></p>
+                                                        <ul style='list-style-type: none; padding-left: 0;'>
+                                                            <li style='margin-bottom: 10px;'>✤ Continue to provide academic and emotional support to students.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Evaluate and expand upon strategies that contributed to the decline.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Encourage community involvement and engagement in educational initiatives.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Monitor trends and adjust interventions based on ongoing assessment and feedback.</li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             """, unsafe_allow_html=True)
+
 
 
                     
@@ -871,8 +941,6 @@ def main():
                     if sy_input != 0 and id_input != 0:
                         user_data = [[sy_input, id_input, en_input]]
                         predictions = stacked_model.predict(user_data)
-
-                        predictions = [max(0, pred) for pred in predictions]
 
                         filtered_data = data[data['Program ID'] == id_input]
 
@@ -946,12 +1014,12 @@ def main():
                                 margin=dict(l=80, r=80, t=100, b=80),  # Adjust margins for better display
                                 transition={'duration': 1000}  # Add smooth transition/animation
                             )
-                            prediction_text = f"**Predicted Value:** {round(predictions[0])}"
+                            prediction_text = f"Predicted Value: {round(predictions[0])}"
                             if original_value is not None:
-                                original_text = f"**Original Value:** {original_value['Number of Graduates'].values[0]}"
+                                original_text = f"Original Value: {original_value['Number of Graduates'].values[0]}"
 
-                            styled_prediction_text = f"<font color='black' size='+5'>{prediction_text}</font>"
-                            styled_original_text = f"<font color='black' size='+5'>{original_text}</font>"
+                            styled_prediction_text = f"<div style='padding: 20px; border-radius: 50px; margin-bottom: 30px; background: linear-gradient(135deg, #50C878, #458B74, #006400); color: #FFF; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 15px 15px rgba(0, 0, 0, 0.3); animation: rotate-scale 3s ease-in-out infinite, neon-glow 2s linear infinite;'><font size='+6'>{prediction_text}</font></div>"
+                            styled_original_text = f"<div style='padding: 20px; border-radius: 50px; margin-bottom: 30px; color: #006400; animation: rotate-scale 3s ease-in-out infinite, neon-glow 2s linear infinite;'><font size='+6'>{original_text}</font></div>"
 
                             st.markdown(styled_prediction_text, unsafe_allow_html=True)
                             st.markdown(styled_original_text, unsafe_allow_html=True)
@@ -990,19 +1058,30 @@ def main():
                                     with col2:
                                         if st.button('📄 Reports', key="increase_recommendation_button",
                                                     help="Click to see reports"):
-                                            st.write(growth_report)
                                             st.markdown("""
-                                                <div style='color: white;'>
-                                                    <div style='background-color: #023020; padding: 10px; border-radius: 5px;'>
-                                                        <strong>Recommendation for Handling Increase in Graduates:</strong><br>
-                                                        - Expand resources and programs to support increased graduation requirements.<br>
-                                                        - Provide additional academic support and counseling services to ensure student success.<br>
-                                                        - Develop career-oriented workshops and mentorship programs to aid in post-graduation plans.<br>
-                                                        - Enhance collaboration with industries for internship opportunities and practical experience.<br>
-                                                        - Evaluate and adapt curriculum to align with evolving job market demands.<br>
+                                                <div style='color: white; font-family: Arial, sans-serif;'>
+                                                    <div style='margin-bottom: 10px;'>
+                                                        <div style='background-color: #2E8B57; padding: 20px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                            <p>{growth_report}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            """.format(growth_report=growth_report), unsafe_allow_html=True)
+                                            st.markdown("""
+                                            <div style='color: #fff; font-family: Arial, sans-serif;'>
+                                                <div style='background-color: #2E8B57; padding: 30px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                        <h2 style='margin-bottom: 20px;'>Recommendation for Handling Increase in Graduates:</h2>
+                                                        <ul style='list-style-type: none; padding-left: 0;'>
+                                                            <li style='margin-bottom: 10px;'>✤ Expand resources and programs to support increased graduation requirements.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Provide additional academic support and counseling services to ensure student success.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Develop career-oriented workshops and mentorship programs to aid in post-graduation plans.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Enhance collaboration with industries for internship opportunities and practical experience.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Evaluate and adapt curriculum to align with evolving job market demands.</li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             """, unsafe_allow_html=True)
+
 
                                 # Checking for decrease to show recommendation button
                                 if show_decrease_recommendation:
@@ -1010,19 +1089,30 @@ def main():
                                     with col2:
                                         if st.button('📄 Reports', key="decrease_recommendation_button",
                                                     help="Click to see reports"):
-                                            st.write(decrease_report)
                                             st.markdown("""
-                                                <div style='color: white;'>
-                                                    <div style='background-color: #023020; padding: 10px; border-radius: 5px;'>
-                                                        <strong>Recommendation for Handling Decrease in Graduates:</strong><br>
-                                                        - Investigate reasons behind the decrease and address potential issues.<br>
-                                                        - Offer additional support services to improve graduation rates and retention.<br>
-                                                        - Reassess curriculum and educational strategies to better meet student needs.<br>
-                                                        - Strengthen partnerships with industries for job placement and post-graduation opportunities.<br>
-                                                        - Implement proactive measures to identify and support at-risk students.<br>
+                                                <div style='color: white; font-family: Arial, sans-serif;'>
+                                                    <div style='margin-bottom: 10px;'>
+                                                        <div style='background-color: #2E8B57; padding: 20px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                            <p>{decrease_report}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            """.format(decrease_report=decrease_report), unsafe_allow_html=True)
+                                            st.markdown("""
+                                                <div style='color: #fff; font-family: Arial, sans-serif;'>
+                                                    <div style='background-color: #2E8B57; padding: 30px; border-radius: 30px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);'>
+                                                        <h2 style='margin-bottom: 20px;'>Recommendation for Handling Decrease in Graduates:</h2>
+                                                        <ul style='list-style-type: none; padding-left: 0;'>
+                                                            <li style='margin-bottom: 10px;'>✤ Investigate reasons behind the decrease and address potential issues.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Offer additional support services to improve graduation rates and retention.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Reassess curriculum and educational strategies to better meet student needs.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Strengthen partnerships with industries for job placement and post-graduation opportunities.</li>
+                                                            <li style='margin-bottom: 10px;'>✤ Implement proactive measures to identify and support at-risk students.</li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             """, unsafe_allow_html=True)
+
 
 
                     
